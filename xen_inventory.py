@@ -146,73 +146,66 @@ class XenServer:
                 return self.list_and_save(cache_path)
 
 
-def parse_config():
-    """ Parse available configuration.
-    Default configuration file: xen-inventory.ini
-    Configuration file path may be overridden,
-    by defining an environment variable: XEN_INVENTORY_INI_PATH
-    :return: (cache_path, cache_ttl, xen_host, xen_user, xen_pass)
-    """
-    config = ConfigParser()
-    xen_default_ini_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'xen-inventory.ini')
-    xen_ini_path = os.path.expanduser(
-        os.path.expandvars(os.environ.get('XEN_INVENTORY_INI_PATH', xen_default_ini_path)))
-    config.read(xen_ini_path)
-    cache_path = config.get('GENERIC', 'cache_path', fallback='/tmp/ansible-xen-inventory-cache.tmp')
-    cache_ttl = config.getint('GENERIC', 'cache_ttl')
-    xen_host = config.get('GENERIC', 'xen_host', fallback='')
-    xen_user = config.get('GENERIC', 'xen_user', fallback='')
-    xen_pass = config.get('GENERIC', 'xen_pass', fallback='')
+# def parse_config():
+#     """ Parse available configuration.
+#     Default configuration file: xen-inventory.ini
+#     Configuration file path may be overridden,
+#     by defining an environment variable: XEN_INVENTORY_INI_PATH
+#     :return: (cache_path, cache_ttl, xen_host, xen_user, xen_pass)
+#     """
+#     config = ConfigParser()
+#     xen_default_ini_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'xen-inventory.ini')
+#     xen_ini_path = os.path.expanduser(
+#         os.path.expandvars(os.environ.get('XEN_INVENTORY_INI_PATH', xen_default_ini_path)))
+#     config.read(xen_ini_path)
+#     cache_path = config.get('GENERIC', 'cache_path', fallback='/tmp/ansible-xen-inventory-cache.tmp')
+#     cache_ttl = config.getint('GENERIC', 'cache_ttl')
+#     xen_host = config.get('GENERIC', 'xen_host', fallback='')
+#     xen_user = config.get('GENERIC', 'xen_user', fallback='')
+#     xen_pass = config.get('GENERIC', 'xen_pass', fallback='')
 
-    return cache_path, cache_ttl, xen_host, xen_user, xen_pass
+#     return cache_path, cache_ttl, xen_host, xen_user, xen_pass
 
 
-def get_args():
-    """
-    Return Command Line Arguments.
-    :return: ArgumentParser instance
-    """
-    parser = ArgumentParser(description="Ansible XEN inventory.",
-                            epilog="Example:\n"
-                                   "./xen_inventory.py -l\n"
-                                   "./xen_inventory.py -s <xen.server.hostname>"
-                                   "-u <xen_username> -p <xen_password> -l\n")
-    parser.add_argument('-s', '--hostname', help='Xen Server FQDN')
-    parser.add_argument('-u', '--username', help='Xen Server username')
-    parser.add_argument('-p', '--password', help='Xen Server password')
-    parser.add_argument('-g', '--guest', help='Print a single guest')
-    parser.add_argument('-x', '--host', help='Print a single guest')
-    parser.add_argument('-r', '--reload-cache', help='Reload cache', action='store_true')
-    parser.add_argument('-l', '--list', help='List all VMs', action='store_true')
-    return parser.parse_args()
+# def get_args():
+#     """
+#     Return Command Line Arguments.
+#     :return: ArgumentParser instance
+#     """
+#     parser = ArgumentParser(description="Ansible XEN inventory.",
+#                             epilog="Example:\n"
+#                                    "./xen_inventory.py -l\n"
+#                                    "./xen_inventory.py -s <xen.server.hostname>"
+#                                    "-u <xen_username> -p <xen_password> -l\n")
+#     parser.add_argument('-s', '--hostname', help='Xen Server FQDN')
+#     parser.add_argument('-u', '--username', help='Xen Server username')
+#     parser.add_argument('-p', '--password', help='Xen Server password')
+#     parser.add_argument('-g', '--guest', help='Print a single guest')
+#     parser.add_argument('-x', '--host', help='Print a single guest')
+#     parser.add_argument('-r', '--reload-cache', help='Reload cache', action='store_true')
+#     parser.add_argument('-l', '--list', help='List all VMs', action='store_true')
+#     return parser.parse_args()
 
 
 def main():
 
     # - Get command line args and config args.
-    args = get_args()
-    (cache_path, cache_ttl, xen_host, xen_user, xen_pass) = parse_config()
+    # args = get_args()
+    # (cache_path, cache_ttl, xen_host, xen_user, xen_pass) = parse_config()
 
     # - Override with arg parameters if defined
-    if not args.password:
-        if not xen_pass:
-            import getpass
-            xen_pass = getpass.getpass()
-        setattr(args, 'password', xen_pass)
-    if not args.username:
-        setattr(args, 'username', xen_user)
-    if not args.hostname:
-        setattr(args, 'hostname', xen_host)
+    hostname = os.environ.get('XEN_HOST')
+    username = os.environ.get('XEN_USER')
+    password = os.environ.get('XEN_PASSWORD')
+    cache_path = /tmp/ansible-xen-inventory-cache.tmp
+    cache_ttl = 3600
 
     # - Perform requested operations (list, reload-cache, host/guest)
-    if args.host or args.guest:
-        print ('{}')
-        exit(0)
-    elif args.list or args.reload_cache:
-        x = XenServer(args.hostname, args.username, args.password)
-        data = x.cached_inventory(cache_path=cache_path, cache_ttl=cache_ttl, refresh=args.reload_cache)
-        print ("{}".format(dumps(data)))
-        exit(0)
+
+    x = XenServer(hostname, username, password)
+    data = x.cached_inventory(cache_path=cache_path, cache_ttl=cache_ttl, refresh=True)
+    print ("{}".format(dumps(data)))
+    exit(0)
 
 
 if __name__ == "__main__":
