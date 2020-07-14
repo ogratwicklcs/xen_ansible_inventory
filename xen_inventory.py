@@ -194,10 +194,10 @@ def main():
     # (cache_path, cache_ttl, xen_host, xen_user, xen_pass) = parse_config()
 
     # - Override with arg parameters if defined
-    hostname = os.environ.get('XEN_HOST')
-    username = os.environ.get('XEN_USER')
-    password = os.environ.get('XEN_PASSWORD')
-    cache_path = /tmp/ansible-xen-inventory-cache.tmp
+    hostname = os.environ.get('xend_hostname')
+    username = os.environ.get('xend_user')
+    password = os.environ.get('xend_password')
+    cache_path = '/tmp/ansible-xen-inventory-cache.tmp'
     cache_ttl = 3600
 
     # - Perform requested operations (list, reload-cache, host/guest)
@@ -210,3 +210,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
